@@ -14,12 +14,12 @@ import (
 )
 
 // RunApp starts the main loop of the app
-func RunApp(twitterCredentials structs.TwitterCredentials, outputName string, outputConfig interface{}) {
+func RunApp(t structs.TwitterConfig, outputName string, outputConfig interface{}) {
 
 	tweets := make(chan *twitter.Tweet)
 
-	config := oauth1.NewConfig(twitterCredentials.ConsumerKey, twitterCredentials.ConsumerSecret)
-	token := oauth1.NewToken(twitterCredentials.APIKey, twitterCredentials.APISecret)
+	config := oauth1.NewConfig(t.Credentials.APIKey, t.Credentials.APISecret)
+	token := oauth1.NewToken(t.Credentials.AccessToken, t.Credentials.AccessSecret)
 
 	httpClient := config.Client(oauth1.NoContext, token)
 
@@ -39,7 +39,7 @@ func RunApp(twitterCredentials structs.TwitterCredentials, outputName string, ou
 	}
 
 	filterParams := &twitter.StreamFilterParams{
-		Track:         []string{"iphone", "cat", "dog"},
+		Track:         t.Keywords,
 		StallWarnings: twitter.Bool(true),
 	}
 	println("Creating the stream")

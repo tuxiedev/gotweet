@@ -28,25 +28,26 @@ import (
 
 var cfgFile string
 
-var twitterAPIKey, twitterAPIKeySecret, twitterConsumerKey, twitterConsumerSecret string
+var twitterAPIKey, twitterAPIKeySecret, twitterAccessToken, twitterAccessSecret string
 
-// rootCmd represents the base command when called without any subcommands
+var keywords []string
+
 var rootCmd = &cobra.Command{
 	Use:   "gotweet",
 	Short: "Read tweets and publish them somewhere",
 	Long:  `For more information, checkout github.com/tuxiedev`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) {
-	// 	fmt.Println("hello world")
-	// },
 }
 
-func getTwitterConfigs() structs.TwitterCredentials {
-	return structs.TwitterCredentials{
-		twitterAPIKey, twitterAPIKeySecret, twitterConsumerKey, twitterConsumerSecret,
+func getTwitterConfigs() structs.TwitterConfig {
+	return structs.TwitterConfig{
+		Credentials: structs.TwitterCredentials{
+			APIKey:         twitterAPIKey,
+			APISecret:      twitterAPIKeySecret,
+			AccessToken:    twitterAccessToken,
+			AccessSecret: 	twitterAccessSecret,
+		},
+		Keywords: keywords,
 	}
-	// RequiredRootPersistentFlags root flags in the persistent command
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -79,20 +80,22 @@ func init() {
 			"Twitter API secret",
 		},
 		{
-			&twitterConsumerKey,
-			"consumer-key",
+			&twitterAccessToken,
+			"access-token",
 			"Twitter consumer key",
 		},
 		{
-			&twitterConsumerSecret,
-			"consumer-secret",
+			&twitterAccessSecret,
+			"access-secret",
 			"Twitter consumer secret",
 		},
 	})
 
+	pf.StringArrayVar(&keywords, "keywords", []string{}, "keywords to filter the stream on")
+
 	pf.StringVar(&cfgFile, "config", "", "config file (default is $HOME/.gotweet.yaml)")
 
-	//cobra.MarkFlagRequired(pf, "api-key", "api-secret", "consumer-key", "consumer-secret")
+	cobra.MarkFlagRequired(pf, "keywords")
 
 }
 

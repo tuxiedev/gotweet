@@ -4,8 +4,14 @@ package structs
 type TwitterCredentials struct {
 	APIKey         string
 	APISecret      string
-	ConsumerKey    string
-	ConsumerSecret string
+	AccessToken    string
+	AccessSecret string
+}
+
+// TwitterConfig represents Twitter configuration
+type TwitterConfig struct {
+	Credentials TwitterCredentials
+	Keywords    []string
 }
 
 // KafkaConfig configuration for kafka

@@ -16,8 +16,6 @@ type Kafka struct {
 	producer sarama.AsyncProducer
 }
 
-var producerErrors, successes int
-
 // Init initializes an async Kafka producer
 func (k *Kafka) Init() {
 	k.config = k.Config.(structs.KafkaConfig)
@@ -30,18 +28,18 @@ func (k *Kafka) Init() {
 	if err != nil {
 		log.Fatalln("Failed to start Sarama producer:", err)
 	}
+
 	k.producer = producer
 
 	go func() {
 		for range k.producer.Successes() {
-			successes++
+			// noop
 		}
 	}()
 
 	go func() {
 		for err := range producer.Errors() {
 			log.Println(err)
-			producerErrors++
 		}
 	}()
 
@@ -66,7 +64,7 @@ func (k *Kafka) Start(tweetChannel chan *twitter.Tweet) {
 			if err != nil {
 				log.Println("ERR: error decoding json from tweet")
 			}
-			k.sendTweetToKafka(tbytes)
+			go k.sendTweetToKafka(tbytes)
 		default:
 		}
 	}
