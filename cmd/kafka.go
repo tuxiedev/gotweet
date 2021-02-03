@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/tuxiedev/gotweet/pkg/structs"
 )
 
@@ -46,21 +47,11 @@ func getKafkaConfiguration() structs.KafkaConfig {
 func init() {
 	rootCmd.AddCommand(kafkaCmd)
 
-	// Here you will define your flags and configuration settings.
-
 	pf := kafkaCmd.Flags()
 
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	var requiredFlags = []RequiredFlag{
-		{
-			&outputTopic,
-			"output-topic",
-			"kafka output topic",
-		},
-	}
-	buildFlagsAndMarkThemRequired(pf, requiredFlags)
-	pf.StringArrayVarP(&bootstrapBrokers, "bootstrap-brokers", "t", []string{}, "REQUIRED: Comma separated list of kafka brokers to connect to")
+	pf.StringVarP(&outputTopic, "output-topic", "o", viper.GetString("KAFKA_OUTPUT_TOPIC"), "Kafka output topic")
+	pf.StringArrayVarP(&bootstrapBrokers, "bootstrap-brokers", "b", viper.GetStringSlice("KAFKA_BOOTSTRAP_BROKERS"), "REQUIRED: Comma separated list of kafka brokers to connect to")
+
 	cobra.MarkFlagRequired(pf, "bootstrap-brokers")
 
 }

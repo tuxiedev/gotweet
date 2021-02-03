@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 package cmd
 
 import (
@@ -22,7 +23,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/tuxiedev/gotweet/pkg/structs"
 
-	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 )
 
@@ -41,17 +41,15 @@ var rootCmd = &cobra.Command{
 func getTwitterConfigs() structs.TwitterConfig {
 	return structs.TwitterConfig{
 		Credentials: structs.TwitterCredentials{
-			APIKey:         twitterAPIKey,
-			APISecret:      twitterAPIKeySecret,
-			AccessToken:    twitterAccessToken,
-			AccessSecret: 	twitterAccessSecret,
+			APIKey:       twitterAPIKey,
+			APISecret:    twitterAPIKeySecret,
+			AccessToken:  twitterAccessToken,
+			AccessSecret: twitterAccessSecret,
 		},
 		Keywords: keywords,
 	}
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
@@ -60,67 +58,40 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
-
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
 
 	pf := rootCmd.PersistentFlags()
 
-	buildFlagsAndMarkThemRequired(pf, []RequiredFlag{
+	viper.AutomaticEnv()
+
+	buildFlags(pf, []RequiredFlag{
 		{
 			&twitterAPIKey,
-			"api-key",
+			"twitter-api-key",
+			"TWITTER_API_KEY",
 			"Twitter API key",
 		},
 		{
 			&twitterAPIKeySecret,
-			"api-secret",
+			"twitter-api-secret",
+			"TWITTER_API_SECRET",
 			"Twitter API secret",
 		},
 		{
 			&twitterAccessToken,
-			"access-token",
-			"Twitter consumer key",
+			"twitter-access-token",
+			"TWITTER_ACCESS_TOKEN",
+			"Twitter access token",
 		},
 		{
 			&twitterAccessSecret,
-			"access-secret",
-			"Twitter consumer secret",
+			"twitter-access-secret",
+			"TWITTER_ACCESS_SECRET",
+			"Twitter access secret",
 		},
 	})
 
-	pf.StringArrayVar(&keywords, "keywords", []string{}, "keywords to filter the stream on")
-
-	pf.StringVar(&cfgFile, "config", "", "config file (default is $HOME/.gotweet.yaml)")
+	pf.StringArrayVarP(&keywords, "keywords", "k", viper.GetStringSlice("TWITTER_KEYWORDS"), "keywords to filter the stream on")
 
 	cobra.MarkFlagRequired(pf, "keywords")
 
-}
-
-// initConfig reads in config file and ENV variables if set.
-func initConfig() {
-	if cfgFile != "" {
-		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
-	} else {
-		// Find home directory.
-		home, err := homedir.Dir()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-
-		// Search config in home directory with name ".gotweet" (without extension).
-		viper.AddConfigPath(home)
-		viper.SetConfigName(".gotweet")
-	}
-
-	viper.AutomaticEnv() // read in environment variables that match
-
-	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
-	}
 }
