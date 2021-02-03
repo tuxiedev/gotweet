@@ -9,17 +9,17 @@ import (
 
 	"github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/oauth1"
-	"github.com/tuxiedev/gotweet/pkg/outputs/console"
+	"github.com/tuxiedev/gotweet/pkg/outputs"
 	"github.com/tuxiedev/gotweet/pkg/structs"
 )
 
 // RunApp starts the main loop of the app
-func RunApp(twitterConfig structs.TwitterCredentials, outputName string, outputConfig interface{}) {
+func RunApp(twitterCredentials structs.TwitterCredentials, outputName string, outputConfig interface{}) {
 
 	tweets := make(chan *twitter.Tweet)
 
-	config := oauth1.NewConfig(twitterConfig.ConsumerKey, twitterConfig.ConsumerSecret)
-	token := oauth1.NewToken(twitterConfig.APIKey, twitterConfig.APISecret)
+	config := oauth1.NewConfig(twitterCredentials.ConsumerKey, twitterCredentials.ConsumerSecret)
+	token := oauth1.NewToken(twitterCredentials.APIKey, twitterCredentials.APISecret)
 
 	httpClient := config.Client(oauth1.NoContext, token)
 
@@ -39,7 +39,7 @@ func RunApp(twitterConfig structs.TwitterCredentials, outputName string, outputC
 	}
 
 	filterParams := &twitter.StreamFilterParams{
-		Track:         []string{"iphone"},
+		Track:         []string{"iphone", "cat", "dog"},
 		StallWarnings: twitter.Bool(true),
 	}
 	println("Creating the stream")
@@ -51,15 +51,23 @@ func RunApp(twitterConfig structs.TwitterCredentials, outputName string, outputC
 
 	go demux.HandleChan(stream.Messages)
 
-	if outputName == "console" {
-		go console.Output(tweets)
+	// configure and start output
+	var output outputs.Output
+	switch outputName {
+	case "console":
+		output = &outputs.Console{}
+	case "kafka":
+		output = &outputs.Kafka{Config: outputConfig}
 	}
+	output.Init()
+	go output.Start(tweets)
 
 	ch := make(chan os.Signal)
 	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
 	log.Println(<-ch)
 
 	fmt.Println("Stopping Stream...")
+	output.Stop()
 	stream.Stop()
 	close(tweets)
 

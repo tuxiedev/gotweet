@@ -16,8 +16,9 @@ limitations under the License.
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
-	"github.com/tuxiedev/gotweet/pkg/app"
 	"github.com/tuxiedev/gotweet/pkg/structs"
 )
 
@@ -27,13 +28,15 @@ var kafkaCmd = &cobra.Command{
 	Short: "Produce tweets to Kafka",
 	Long:  `When running in this mode, the application produces incoming tweets to a Kafka topic`,
 	Run: func(cmd *cobra.Command, args []string) {
-		app.RunApp(getTwitterConfigs(), "kafka", getKafkaConfiguration())
+		runApp("kafka", getKafkaConfiguration())
 	},
 }
 
-var bootstrapBrokers, outputTopic string
+var outputTopic string
+var bootstrapBrokers []string
 
 func getKafkaConfiguration() structs.KafkaConfig {
+	fmt.Println("cmd...", bootstrapBrokers)
 	return structs.KafkaConfig{
 		BootstrapBrokers: bootstrapBrokers,
 		OutputTopic:      outputTopic,
@@ -45,22 +48,19 @@ func init() {
 
 	// Here you will define your flags and configuration settings.
 
-	pf := rootCmd.Flags()
+	pf := kafkaCmd.Flags()
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
 	var requiredFlags = []RequiredFlag{
 		{
-			&bootstrapBrokers,
-			"bootstrap-brokers",
-			"Kafka bootstrap brokers",
-		},
-		{
 			&outputTopic,
 			"output-topic",
-			"kafka-output-topic",
+			"kafka output topic",
 		},
 	}
 	buildFlagsAndMarkThemRequired(pf, requiredFlags)
+	pf.StringArrayVarP(&bootstrapBrokers, "bootstrap-brokers", "t", []string{}, "REQUIRED: Comma separated list of kafka brokers to connect to")
+	cobra.MarkFlagRequired(pf, "bootstrap-brokers")
 
 }

@@ -10,6 +10,6 @@ type TwitterCredentials struct {
 
 // KafkaConfig configuration for kafka
 type KafkaConfig struct {
-	BootstrapBrokers string
+	BootstrapBrokers []string
 	OutputTopic      string
 }

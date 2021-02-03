@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"github.com/tuxiedev/gotweet/pkg/app"
 )
 
 // RequiredFlag Defines a flag
@@ -19,3 +20,6 @@ func buildFlagsAndMarkThemRequired(pf *pflag.FlagSet, requiredFlags []RequiredFl
 	}
 }
 
+func runApp(outputName string, outputConfig interface{}) {
+	app.RunApp(getTwitterConfigs(), outputName, outputConfig)
+}
