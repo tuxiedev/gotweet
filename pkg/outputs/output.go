@@ -11,7 +11,7 @@ type Output interface {
 	Stop()
 }
 
-// InitializeOutputs initializes and starts the output worker
+// InitializeOutput initializes and starts the output worker
 func InitializeOutput(outputName string, outputConfig interface{},
 	tweets chan *twitter.Tweet) (Output, error) {
 
