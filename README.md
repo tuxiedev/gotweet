@@ -1,6 +1,10 @@
 # gotweet
 
-Stream tweets to some number of outputs
+Stream tweets to some of output
+
+Currently implemented outputs
+- Console
+- [Kafka](https://kafka.apache.org)
 
 
 ## Getting Started
@@ -54,7 +58,11 @@ The twitter credentials can be passed as environment variables to the command. H
 | `twitter-api-secret` | `TWITTER_API_SECRET` |  
 
 ### Producing tweets to different outputs
-
+#### Console
+Easiest way to see the app running is to get the tweets printed directly on stdout.
+```
+$ ./gotweet console
+```
 #### Kafka
 You can use the `docker-compose.yml` in the project to start a single broker kafka cluster on local
 ```
