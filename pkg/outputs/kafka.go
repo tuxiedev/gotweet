@@ -17,7 +17,7 @@ type Kafka struct {
 }
 
 // Init initializes an async Kafka producer
-func (k *Kafka) Init() {
+func (k *Kafka) Init() error {
 	k.config = k.Config.(structs.KafkaConfig)
 	config := sarama.NewConfig()
 	config.Producer.RequiredAcks = sarama.WaitForLocal // Wait for all in-sync replicas to ack the message
@@ -26,7 +26,7 @@ func (k *Kafka) Init() {
 
 	producer, err := sarama.NewAsyncProducer(k.config.BootstrapBrokers, config)
 	if err != nil {
-		log.Fatalln("Failed to start Sarama producer:", err)
+		return err
 	}
 
 	k.producer = producer
@@ -42,6 +42,8 @@ func (k *Kafka) Init() {
 			log.Println(err)
 		}
 	}()
+
+	return nil
 
 }
 

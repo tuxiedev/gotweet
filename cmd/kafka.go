@@ -26,7 +26,7 @@ import (
 // kafkaCmd represents the kafka command
 var kafkaCmd = &cobra.Command{
 	Use:   "kafka",
-	Short: "Produce tweets to Kafka",
+	Short: "Produces tweets to Kafka",
 	Long:  `When running in this mode, the application produces incoming tweets to a Kafka topic`,
 	Run: func(cmd *cobra.Command, args []string) {
 		runApp("kafka", getKafkaConfiguration())

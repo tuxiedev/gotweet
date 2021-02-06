@@ -7,60 +7,28 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/dghubble/go-twitter/twitter"
-	"github.com/dghubble/oauth1"
+	dgt "github.com/dghubble/go-twitter/twitter"
 	"github.com/tuxiedev/gotweet/pkg/outputs"
 	"github.com/tuxiedev/gotweet/pkg/structs"
+	"github.com/tuxiedev/gotweet/pkg/twitter"
 )
 
 // RunApp starts the main loop of the app
 func RunApp(t structs.TwitterConfig, outputName string, outputConfig interface{}) {
 
-	tweets := make(chan *twitter.Tweet)
+	tweets := make(chan *dgt.Tweet)
 
-	config := oauth1.NewConfig(t.Credentials.APIKey, t.Credentials.APISecret)
-	token := oauth1.NewToken(t.Credentials.AccessToken, t.Credentials.AccessSecret)
+	stream, err := twitter.StartConsumingFromTwitter(t, tweets)
 
-	httpClient := config.Client(oauth1.NoContext, token)
-
-	// Twitter Client
-	client := twitter.NewClient(httpClient)
-
-	// Convenience Demux demultiplexed stream messages
-	demux := twitter.NewSwitchDemux()
-	demux.Tweet = func(tweet *twitter.Tweet) {
-		tweets <- tweet
-	}
-	demux.DM = func(dm *twitter.DirectMessage) {
-		fmt.Println(dm.SenderID)
-	}
-	demux.Event = func(event *twitter.Event) {
-		fmt.Printf("%#v\n", event)
-	}
-
-	filterParams := &twitter.StreamFilterParams{
-		Track:         t.Keywords,
-		StallWarnings: twitter.Bool(true),
-	}
-	println("Creating the stream")
-
-	stream, err := client.Streams.Filter(filterParams)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to initialize twitter stream %v\n", err)
 	}
 
-	go demux.HandleChan(stream.Messages)
+	output, err := outputs.InitializeOutput(outputName, outputConfig, tweets)
 
-	// configure and start output
-	var output outputs.Output
-	switch outputName {
-	case "console":
-		output = &outputs.Console{}
-	case "kafka":
-		output = &outputs.Kafka{Config: outputConfig}
+	if err != nil {
+		log.Fatalf("Failed to initialize output %\n", err)
 	}
-	output.Init()
-	go output.Start(tweets)
 
 	ch := make(chan os.Signal)
 	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)

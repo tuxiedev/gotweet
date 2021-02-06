@@ -12,8 +12,9 @@ type Console struct {
 }
 
 // Init initializes console output
-func (c *Console) Init() {
+func (c *Console) Init() error {
 	fmt.Println("Starting console output")
+	return nil
 }
 
 // Start starts the console output listening to a channel of tweets
