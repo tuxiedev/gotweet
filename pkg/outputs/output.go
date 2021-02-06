@@ -6,14 +6,13 @@ import (
 
 // Output defines an output
 type Output interface {
-	Init() (error)
+	Init() error
 	Start(chan *twitter.Tweet)
 	Stop()
 }
 
-
 // InitializeOutputs initializes and starts the output worker
-func InitializeOutput(outputName string, outputConfig interface{}, 
+func InitializeOutput(outputName string, outputConfig interface{},
 	tweets chan *twitter.Tweet) (Output, error) {
 
 	var initializedOutput Output

@@ -2,9 +2,9 @@ package structs
 
 // TwitterCredentials twitter credentials configuration
 type TwitterCredentials struct {
-	APIKey         string
-	APISecret      string
-	AccessToken    string
+	APIKey       string
+	APISecret    string
+	AccessToken  string
 	AccessSecret string
 }
 
