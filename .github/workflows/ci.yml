@@ -3,7 +3,7 @@ name: Go
 on:
   push:
     branches: [ '*' ]
-    paths-ignore: ['/docs', '/README.md']
+    paths-ignore: ['/docs', '/README.md', '.github/release-artifacts.yml']
   pull_request:
     branches: [ master ]
 

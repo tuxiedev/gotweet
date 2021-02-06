@@ -39,7 +39,7 @@ jobs:
           goarch: amd64
           extra_files: LICENSE
   release-linux-arm64:
-    name: release arm/amd64
+    name: release linux/arm64
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
