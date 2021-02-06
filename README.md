@@ -2,13 +2,17 @@
 
 Stream tweets to some of output
 
-Currently implemented outputs
-- Console
-- [Kafka](https://kafka.apache.org)
+* [Getting Started](#getting-started)
+  * [Get twitter credentials](#get-twitter-credentials)
+  * [Using Environment variables for twitter credentials](#using-environment-variables-for-twitter-credentials)
+  * [Producing tweets to different outputs](#producing-tweets-to-different-outputs)
+    * [Console](#console)
+    * [Kafka](#kafka)
+* [Development](#development)
+    * [Build](#build)
 
 
 ## Getting Started
-
 ### Get twitter credentials
 
 1. Get an approved Twitter developer account https://developer.twitter.com/en/apply-for-access
@@ -81,6 +85,11 @@ $ ./gotweet kafka --bootstrap-brokers localhost:9092 -output-topic tweets
 ## Development
 ### Build
 ```
-go build
+$ git clone https://github.com/tuxiedev/gotweet
+$ go get -v ./...
+```
+### test
+```
+$ go test ./...
 ```
 
