@@ -18,10 +18,12 @@ Currently implemented outputs
     * API Secret
     * Access Token
     * Access Secret
-4. Run the binary
+4. Build the binary
 ```
-./gotweet console
+$ git clone https://github.com/tuxiedev/gotweet
+$ go build
 ```
+Continue with following steps to get the build running
 
 The goal of this project is to sink tweets into different outputs. Hence, the submodule of the top level commands will be the name of the output the tweets are to be produced to
 
